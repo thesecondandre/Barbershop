@@ -1,0 +1,8 @@
+query Servicos {
+  servicos {
+    id
+    nome
+    valorPadrao
+    duracaoPadrao
+  }
+}

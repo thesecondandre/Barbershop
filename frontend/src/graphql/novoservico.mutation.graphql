@@ -1,0 +1,5 @@
+mutation NovoServico($entrada: EntradaNovoServico!) {
+  novoServico(entrada: $entrada) {
+    id
+  }
+}

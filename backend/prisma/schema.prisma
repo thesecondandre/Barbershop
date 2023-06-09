@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator pothos {
+  provider = "prisma-pothos-types"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id              Int       @id @default(autoincrement())
+  nome            String
+  telefone        String    @unique
+  email           String?   @unique
+  perfil          Perfil    @default(CLIENTE)
+  agendamentos    Agendamento[]  @relation("cliente")
+  servicos        PrestadorServico[]
+  compromissos    Agendamento[]  @relation("profissional")
+  dthCriacao      DateTime  @default(now())
+  dthAtualizacao  DateTime  @updatedAt
+
+  @@index([telefone])
+}
+
+enum Perfil {
+  CLIENTE
+  PROFISSIONAL
+  ADMIN
+}
+
+model Servico {
+  id            Int     @id @default(autoincrement())
+  nome          String  @unique
+  valorPadrao   Float
+  duracaoPadrao Float
+  prestadores   PrestadorServico[]
+  agendamentos  Agendamento[]
+  dthAtualizacao  DateTime  @updatedAt
+}
+
+model PrestadorServico {
+  id                Int       @id @default(autoincrement())
+  profissional      Usuario   @relation(fields: [profissionalId], references: [id])
+  profissionalId    Int
+  servico           Servico   @relation(fields: [servicoId], references: [id])
+  servicoId         Int
+  valor             Float
+  dthAtualizacao    DateTime  @updatedAt
+}
+
+model Agendamento {
+  id                Int       @id @default(autoincrement())
+  cliente           Usuario   @relation("cliente", fields: [clienteId], references: [id])
+  clienteId         Int
+  profissional      Usuario   @relation("profissional", fields: [profissionalId], references: [id])
+  profissionalId    Int
+  servico           Servico   @relation(fields: [servicoId], references: [id])
+  servicoId         Int
+  dthAgendamento    DateTime
+  dthAtualizacao    DateTime  @updatedAt
+}
